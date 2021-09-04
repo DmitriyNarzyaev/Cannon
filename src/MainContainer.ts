@@ -2,7 +2,8 @@ import Container = PIXI.Container;
 import { Loader, Sprite } from "pixi.js";
 import Gun from "./Gun";
 import TitleScreen from "./TitleScreen";
-import Button from "./Button";
+import Button from "./Button"
+import InteractionEvent = PIXI.interaction.InteractionEvent;;
 
 export default class MainContainer extends Container {
 	public static readonly WIDTH:number = 1500;
@@ -15,6 +16,7 @@ export default class MainContainer extends Container {
 	constructor() {
 		super();
 		this.pictureLoader();
+		this.interactive = true;
 	}
 
 	private pictureLoader():void {
@@ -42,16 +44,18 @@ export default class MainContainer extends Container {
 		this.addChild(this._button);
 	}
 
-	private removeTitle():void {
+	private removeAll():void {
 		this.removeChild(this._title);
 		this.removeChild(this._button);
 	}
 
 	private startGame():void {
-		this.removeTitle();
+		this.removeAll();
+		// this.stopTicker();
 
 		this.initialBackground();
 		this.initialGun();
+		// this.startTicker();
 	}
 
 	private initialBackground():void {
@@ -65,5 +69,32 @@ export default class MainContainer extends Container {
 		this._gun.x = 50;
 		this._gun.y = MainContainer.HEIGHT - carriageHeight;
 		this.addChild(this._gun);
+
+		this.addListener('mousemove', this.mouseMoveHandler, this);
 	}
+
+	private mouseMoveHandler(e:InteractionEvent):void {
+		console.log("************");
+		Gun.BARREL_CONTAINER.rotation =
+		Math.atan2 (
+			e.data.global.x - Gun.BARREL_CONTAINER.x,
+			-(e.data.global.y - Gun.BARREL_CONTAINER.y)
+		)	-Math.PI/2;
+	}
+
+	// private startTicker():void {
+	// 	Global.PIXI_APP.ticker.add(this.ticker, this);
+	// }
+
+	// private stopTicker():void {
+	// 	Global.PIXI_APP.ticker.remove(this.ticker, this);
+	// }
+
+	// private ticker():void {
+	// 	this._iterator ++
+	// 	if (this._iterator == 60) {
+	// 		this._iterator = 0;
+	// 		console.log("***");
+	// 	}
+	// }
 }
