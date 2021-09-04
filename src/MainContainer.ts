@@ -1,5 +1,5 @@
 import Container = PIXI.Container;
-import { Loader, Sprite } from "pixi.js";
+import { IPoint, Loader, Sprite } from "pixi.js";
 import Gun from "./Gun";
 import TitleScreen from "./TitleScreen";
 import Button from "./Button"
@@ -73,28 +73,13 @@ export default class MainContainer extends Container {
 		this.addListener('mousemove', this.mouseMoveHandler, this);
 	}
 
-	private mouseMoveHandler(e:InteractionEvent):void {
+	private mouseMoveHandler(event:InteractionEvent):void {
 		console.log("************");
+		let mousePoint:IPoint = Gun.BARREL_CONTAINER.parent.toLocal(event.data.global);
 		Gun.BARREL_CONTAINER.rotation =
 		Math.atan2 (
-			e.data.global.x - Gun.BARREL_CONTAINER.x,
-			-(e.data.global.y - Gun.BARREL_CONTAINER.y)
+			mousePoint.x - Gun.BARREL_CONTAINER.x,
+			-(mousePoint.y - Gun.BARREL_CONTAINER.y)
 		)	-Math.PI/2;
 	}
-
-	// private startTicker():void {
-	// 	Global.PIXI_APP.ticker.add(this.ticker, this);
-	// }
-
-	// private stopTicker():void {
-	// 	Global.PIXI_APP.ticker.remove(this.ticker, this);
-	// }
-
-	// private ticker():void {
-	// 	this._iterator ++
-	// 	if (this._iterator == 60) {
-	// 		this._iterator = 0;
-	// 		console.log("***");
-	// 	}
-	// }
 }
