@@ -5,7 +5,6 @@ import TitleScreen from "./TitleScreen";
 import Button from "./Button"
 import InteractionEvent = PIXI.interaction.InteractionEvent;import { Mob } from "./Mob";
 import Global from "./Global";
-;
 
 export default class MainContainer extends Container {
 	public static readonly WIDTH:number = 1500;

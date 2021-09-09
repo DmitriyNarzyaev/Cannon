@@ -11,10 +11,10 @@ export class Mob extends Graphics
 	constructor() {
 		super();
 		this._circle = new PIXI.Graphics();
-		this._circle.beginFill(0xffffff, 0);
-		this._circle.lineStyle(5, 0xffffff);
-		this._circle.drawCircle(0, 0, this.mobRadius);
-		this._circle.endFill();
+		this._circle
+			.beginFill(0xffffff, 0)
+			.lineStyle(5, 0xffffff)
+			.drawCircle(0, 0, this.mobRadius);
 		this.addChild(this._circle);
 	}
 }
