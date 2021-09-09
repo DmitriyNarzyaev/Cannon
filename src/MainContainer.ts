@@ -3,15 +3,19 @@ import { IPoint, Loader, Sprite } from "pixi.js";
 import Gun from "./Gun";
 import TitleScreen from "./TitleScreen";
 import Button from "./Button"
-import InteractionEvent = PIXI.interaction.InteractionEvent;;
+import InteractionEvent = PIXI.interaction.InteractionEvent;import { Mob } from "./Mob";
+import Global from "./Global";
+;
 
 export default class MainContainer extends Container {
 	public static readonly WIDTH:number = 1500;
 	public static readonly HEIGHT:number = 844;
+	private _mobs:Set<Mob> = new Set();
 	private _background:Sprite;
 	private _title:TitleScreen;
 	private _button:Button;
 	private _gun:Gun;
+	private _iterator:number = 0;
 
 	constructor() {
 		super();
@@ -51,11 +55,10 @@ export default class MainContainer extends Container {
 
 	private startGame():void {
 		this.removeAll();
-		// this.stopTicker();
-
 		this.initialBackground();
 		this.initialGun();
-		// this.startTicker();
+		console.log(this._iterator);
+		Global.PIXI_APP.ticker.add(this.tick, this);
 	}
 
 	private initialBackground():void {
@@ -73,13 +76,33 @@ export default class MainContainer extends Container {
 		this.addListener('mousemove', this.mouseMoveHandler, this);
 	}
 
+	private createMob():void {
+		const mob = new Mob();
+		mob.x = MainContainer.WIDTH + mob.width/2;
+		mob.y = Math.random() * (MainContainer.HEIGHT-mob.height);
+		this.addChild(mob);
+		this._mobs.add(mob);
+	}
+
 	private mouseMoveHandler(event:InteractionEvent):void {
-		console.log("************");
 		let mousePoint:IPoint = Gun.BARREL_CONTAINER.parent.toLocal(event.data.global);
 		Gun.BARREL_CONTAINER.rotation =
 		Math.atan2 (
 			mousePoint.x - Gun.BARREL_CONTAINER.x,
 			-(mousePoint.y - Gun.BARREL_CONTAINER.y)
-		)	-Math.PI/2;
+		) -Math.PI/2;
+	}
+
+	private tick():void {
+		this._iterator ++
+		if (this._iterator == 30) {
+			this.createMob();
+			this._iterator = 0;
+		}
+		if (this._mobs.size >= 0) {
+			this._mobs.forEach((mob:Mob) => {
+				mob.x -= 2
+			});
+		}
 	}
 }
