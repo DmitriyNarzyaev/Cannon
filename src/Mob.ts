@@ -1,7 +1,6 @@
 import Graphics = PIXI.Graphics;
 
-export class Mob extends Graphics
-{
+export class Mob extends Graphics {
 	public mobSpeedY:number = 0;
 	public mobGravity:number = .5 + Math.random()/2;
 	public mobRadius:number = 30+(Math.random())*40;

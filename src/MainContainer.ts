@@ -5,11 +5,13 @@ import TitleScreen from "./TitleScreen";
 import Button from "./Button"
 import InteractionEvent = PIXI.interaction.InteractionEvent;import { Mob } from "./Mob";
 import Global from "./Global";
+import Shot from "./Shot";
 
 export default class MainContainer extends Container {
 	public static readonly WIDTH:number = 1500;
 	public static readonly HEIGHT:number = 844;
 	private _mobs:Set<Mob> = new Set();
+	private _shots:Set<Shot> = new Set();
 	private _background:Sprite;
 	private _title:TitleScreen;
 	private _button:Button;
@@ -73,6 +75,7 @@ export default class MainContainer extends Container {
 		this.addChild(this._gun);
 
 		this.addListener('mousemove', this.mouseMoveHandler, this);
+		this.addListener('mousedown', this.createShot, this);
 	}
 
 	private createMob():void {
@@ -83,25 +86,48 @@ export default class MainContainer extends Container {
 		this._mobs.add(mob);
 	}
 
+	private createShot():void {
+		const shot = new Shot();
+		shot.x = this._gun.x + Gun.BARREL_CONTAINER.x + Gun.BARREL_CONTAINER.width * Math.cos(Gun.BARREL_CONTAINER.rotation);
+		shot.y = this._gun.y + Gun.BARREL_CONTAINER.y + Gun.BARREL_CONTAINER.width * Math.sin(Gun.BARREL_CONTAINER.rotation);
+		this.addChild(shot);
+		this._shots.add(shot);
+	}
+
 	private mouseMoveHandler(event:InteractionEvent):void {
 		let mousePoint:IPoint = Gun.BARREL_CONTAINER.parent.toLocal(event.data.global);
 		Gun.BARREL_CONTAINER.rotation =
 		Math.atan2 (
-			mousePoint.x - Gun.BARREL_CONTAINER.x,
-			-(mousePoint.y - Gun.BARREL_CONTAINER.y)
-		) -Math.PI/2;
+			mousePoint.y - Gun.BARREL_CONTAINER.y,
+			mousePoint.x - Gun.BARREL_CONTAINER.x
+		)
 	}
 
-	private tick():void {
+	private tick(dt:number):void {
+
 		this._iterator ++
 		if (this._iterator == 30) {
 			this.createMob();
 			this._iterator = 0;
 		}
-		if (this._mobs.size >= 0) {
-			this._mobs.forEach((mob:Mob) => {
-				mob.x -= 2
-			});
-		}
+
+		let mobXSpeed = 2 * dt;
+		this._mobs.forEach((mob:Mob) => {
+			mob.x -= mobXSpeed;
+		});
+
+		this._shots.forEach((shot) => {
+			shot.x += Math.cos(shot.gunRotationSave) * shot.shotSpeed * dt;
+			//console.log((Math.PI / 2 + shot.gunRotationSave)*shot.shotSpeed)
+			shot.shotSpeedY += shot.shotGravity;
+			shot.y += (Math.sin(shot.gunRotationSave) * shot.shotSpeed + shot.shotSpeedY) * dt;
+
+			if (shot && shot.parent && shot.x >= MainContainer.WIDTH + shot.width ||
+				shot.y >= MainContainer.HEIGHT+shot.height ||
+				shot.y <= shot.height){
+				this._shots.delete(shot);
+				shot.parent.removeChild(shot);
+			}
+		});
 	}
 }
