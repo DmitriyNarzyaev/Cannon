@@ -104,21 +104,44 @@ export default class MainContainer extends Container {
 	}
 
 	private tick(dt:number):void {
-
 		this._iterator ++
-		if (this._iterator == 30) {
+		if (this._iterator == 60) {
 			this.createMob();
 			this._iterator = 0;
 		}
 
 		let mobXSpeed = 2 * dt;
 		this._mobs.forEach((mob:Mob) => {
+			//Движение мобов
 			mob.x -= mobXSpeed;
+			mob.mobSpeedY += mob.mobGravity;
+			mob.y += mob.mobSpeedY;
+			if (mob.y > MainContainer.HEIGHT-mob.height/2) {
+				mob.y = MainContainer.HEIGHT-mob.height/2;
+				mob.mobSpeedY *= -1;
+			}
+			if (mob && mob.parent && mob.x <= -mob.width/2) {
+				this._mobs.delete(mob);
+				mob.parent.removeChild(mob);
+			}
+
+			this._shots.forEach((shot) => {
+				let xdiff = mob.x - shot.x;
+				let ydiff = mob.y - shot.y;
+				let distance = Math.sqrt(xdiff * xdiff + ydiff * ydiff);
+				if (mob && distance <= mob.mobRadius + shot.shotRadius)			//FIXME: проверить
+				{
+					this._mobs.delete(mob);
+					mob.parent.removeChild(mob);
+					this._shots.delete(shot);
+					shot.parent.removeChild(shot);
+				}
+			});
 		});
 
 		this._shots.forEach((shot) => {
+			//движение пуль
 			shot.x += Math.cos(shot.gunRotationSave) * shot.shotSpeed * dt;
-			//console.log((Math.PI / 2 + shot.gunRotationSave)*shot.shotSpeed)
 			shot.shotSpeedY += shot.shotGravity;
 			shot.y += (Math.sin(shot.gunRotationSave) * shot.shotSpeed + shot.shotSpeedY) * dt;
 

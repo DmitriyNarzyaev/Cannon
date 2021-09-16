@@ -3,7 +3,7 @@ import Container = PIXI.Container;
 
 export default class Shot extends Container {
 	private _shot:PIXI.Graphics;
-	private _shotRadius:number = 5;
+	public shotRadius:number = 5;
     public gunRotationSave:number = Gun.BARREL_CONTAINER.rotation;
     public shotSpeed:number = 16;
     public shotSpeedY:number = 0;
@@ -11,11 +11,10 @@ export default class Shot extends Container {
 
 	constructor() {
     super();
-
         this._shot = new PIXI.Graphics();
         this._shot
             .beginFill(0xff5555, 1)
-            .drawCircle(0, 0, this._shotRadius);
+            .drawCircle(0, 0, this.shotRadius);
         this.addChild(this._shot);
 	}
 }
