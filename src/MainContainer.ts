@@ -17,6 +17,7 @@ export default class MainContainer extends Container {
 	private _button:Button;
 	private _gun:Gun;
 	private _iterator:number = 0;
+	private _mobsPool:Mob[] = [];
 
 	constructor() {
 		super();
@@ -79,11 +80,18 @@ export default class MainContainer extends Container {
 	}
 
 	private createMob():void {
-		const mob = new Mob();
+		console.log("мобов" + this._mobsPool.length);
+		let mob:Mob;
+		if (this._mobsPool.length === 0) {
+			mob = new Mob();
+		} else if (this._mobsPool.length > 0) {
+			mob = this._mobsPool.shift();
+		}
 		mob.x = MainContainer.WIDTH + mob.width/2;
 		mob.y = Math.random() * (MainContainer.HEIGHT-mob.height);
-		this.addChild(mob);
 		this._mobs.add(mob);
+		//this._mobsPool.push(mob);
+		this.addChild(mob);
 	}
 
 	private createShot():void {
@@ -121,6 +129,7 @@ export default class MainContainer extends Container {
 				mob.mobSpeedY *= -1;
 			}
 			if (mob && mob.parent && mob.x <= -mob.width/2) {
+				this._mobsPool.push(mob);
 				this._mobs.delete(mob);
 				mob.parent.removeChild(mob);
 			}
@@ -129,8 +138,9 @@ export default class MainContainer extends Container {
 				let xdiff = mob.x - shot.x;
 				let ydiff = mob.y - shot.y;
 				let distance = Math.sqrt(xdiff * xdiff + ydiff * ydiff);
-				if (mob && distance <= mob.mobRadius + shot.shotRadius)			//FIXME: проверить
-				{
+				if (mob && distance <= mob.mobRadius + shot.shotRadius) {
+					this._mobsPool.push(mob);
+					//this._mobsPool.splice(this._mobsPool.length-1, 1);
 					this._mobs.delete(mob);
 					mob.parent.removeChild(mob);
 					this._shots.delete(shot);
