@@ -1,10 +1,6 @@
-# PixiJS + Webpack starter
-Easy deployment project with:
+# Cannon game
 
-* PixiJS
-* Webpack
-* TypeScript
-* Babel
+You can start this game by clicking on the link https://dmitriynarzyaev.github.io/Cannon/
 
 ## Deployment
 * Download and install Node.js and npm (https://www.npmjs.com/get-npm)
